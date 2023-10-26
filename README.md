@@ -59,21 +59,59 @@ The CFO of your firm has requested a report to help analyze potential fraudulent
 
   * How can you isolate (or group) the transactions of each cardholder?
 
-  * Count the transactions that are less than $2.00 per cardholder. 
+SELECT card_holder.name, credit_card.card, transaction.date, transaction  
+amount, merchant.name AS merchant, merchant_category.name AS category
+FROM transaction
+JOIN credit_card ON credit_card.card = transaction.card
+JOIN card_holder ON card_holder.id = credit_card.cardholder_id
+JOIN merchant ON merchant.id = transaction.id_merchant
+JOIN merchant_category ON merchant_category.id = merchant.id_merchant_category
+ORDER BY card_holder.name;
+
+
+  * Count the transactions that are less than $2.00 per cardholder.
+  
+SELECT COUNT(transaction.amount) AS "Transactions less than $2.00"
+FROM transaction
+WHERE transaction.amount < 2;
+
+"""There are 350 transactions that are less than $2.00"""
   
   * Is there any evidence to suggest that a credit card has been hacked? Explain your rationale.
+
+"""There may be some evidence that excessive small transactions identify fraudulant activity. The number of small charges for each credit card number is abou they same for all."""
 
 * Take your investigation a step futher by considering the time period in which potentially fraudulent transactions are made. 
 
   * What are the top 100 highest transactions made between 7:00 am and 9:00 am?
 
+SELECT *
+FROM transaction
+WHERE date_part('hour', transaction.date) >= 7 AND date_part('hour', transaction.date) <= 9
+LIMIT 100;
+
   * Do you see any anomalous transactions that could be fraudulent?
+
+""" There are some anomalies present in the data collected and various charges below the $2 threshold."""
 
   * Is there a higher number of fraudulent transactions made during this time frame versus the rest of the day?
 
+SELECT COUNT(transaction.amount) AS "Transactions less than $2.00 between 7 - 9 am"
+FROM transaction
+WHERE transaction.amount < 2
+AND date_part('hour', transaction.date) >= 7 
+AND date_part('hour', transaction.date) <= 9
+
+""" There appears to be 43 transactions of < $2.00 that takes place during thiss time period. When considering the full day this does seem to be disproportionally high. """
+
+
   * If you answered yes to the previous question, explain why you think there might be fraudulent transactions during this time frame.
 
+""" see above"""
+
 * What are the top 5 merchants prone to being hacked using small transactions?
+
+""" Wood-Ramirez, Baker Inc, Hood-Phillips, Walker Deleon and Wolf, and Greene-Wood.
 
 * Create a view for each of your queries.
 
